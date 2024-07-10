@@ -6,20 +6,40 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
+from django.utils import timezone
+from axes.helpers import get_client_ip_address
+from axes.models import AccessAttempt
+from axes.utils import reset
+from django.conf import settings
 
 @csrf_protect
+
 
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
+        
+        ip_address = get_client_ip_address(request)
+        
+        attempts = AccessAttempt.objects.filter(username=username, ip_address=ip_address, failures_since_start__gte=settings.AXES_FAILURE_LIMIT)
+        
+        if attempts.exists():
+            messages.error(request, 'Tu cuenta está bloqueada debido a múltiples intentos fallidos.')
+            return redirect(settings.AXES_LOCKOUT_URL)
+
+        user = authenticate(request=request, username=username, password=password)
+        
         if user is not None:
             login(request, user)
-            return redirect('home') 
+            messages.success(request, 'Inicio de sesión exitoso.')
+            return redirect('home')
         else:
-            messages.error(request, 'Usuario o contraseña incorrectos')
+            messages.error(request, 'Usuario o contraseña incorrectos.')
+            return redirect('login')
+
     return render(request, 'login.html')
+
 
 @login_required
 def home_view(request):
@@ -53,3 +73,7 @@ def logout_view(request):
     logout(request)
     messages.info(request, 'Has cerrado sesión.')
     return redirect('login')
+
+
+def lockout_view(request):
+    return render(request, 'lockout.html')

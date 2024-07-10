@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-^vg55l(pq5yf7k8@cshkpnk_1lju&-%u(9oey4ue&odsq0q^qj
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'jlbs_app',
     'django.contrib.admin',
     'django.contrib.auth',
+    'axes',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -37,6 +38,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware'
 ]
 
 ROOT_URLCONF = 'id_logistics_unilever.urls'
@@ -70,6 +72,9 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
 
@@ -106,8 +111,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'jlbs_app/static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -130,3 +137,24 @@ SESSION_COOKIE_HTTPONLY = True
 
 # Configura CSRF como seguro
 CSRF_COOKIE_SECURE = True
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',  # Añadir AxesStandaloneBackend como primer backend
+    'django.contrib.auth.backends.ModelBackend',  # Django ModelBackend es el backend de autenticación predeterminado
+]
+
+AXES_FAILURE_LIMIT = 3
+AXES_COOLOFF_TIME = 24  # En horas
+AXES_LOCKOUT_URL = '/lockout/'  # URL a la que redireccionar en caso de bloqueo
+AXES_LOCKOUT_PARAMETERS = ["username"]
+AXES_CLIENT_IP_CALLABLE = lambda x: None
+
+# Configuración de caché
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+AXES_CACHE = 'default'

@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('lockout/', views.lockout_view, name='lockout'),  # Añadir la ruta de bloqueo
     path('home/', views.home_view, name='home')
 
 ] 

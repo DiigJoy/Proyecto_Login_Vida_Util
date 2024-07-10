@@ -17,9 +17,18 @@
         <h1 class="text-center">Portal - Vida útil</h1>
         <!-- Mostrar mensajes con Bootstrap -->
         {% if messages %}
-            <div class="alert alert-danger text-center" role="alert">
+            <div class="message-container mt-3">
                 {% for message in messages %}
-                    <p class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</p>
+                    {% if message.tags == 'error' %}
+                        <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+                    {% else %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show text-center" role="alert">
+                    {% endif %}
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                 {% endfor %}
             </div>
         {% endif %}
@@ -46,5 +55,12 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.alert').alert('close');
+            }, 2000); // 2000 milisegundos = 2 segundos
+        });
+    </script>
 </body>
 </html>
