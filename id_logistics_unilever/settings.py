@@ -1,6 +1,10 @@
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde un archivo .env
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -9,13 +13,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^vg55l(pq5yf7k8@cshkpnk_1lju&-%u(9oey4ue&odsq0q^qj'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'default-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ['true', '1', 't']
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',')
 
 # Application definition
 
@@ -67,11 +71,11 @@ WSGI_APPLICATION = 'id_logistics_unilever.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'id_logistics_proyect_1',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': os.getenv('MYSQL_DATABASE', 'id_logistics_proyect_1'),
+        'USER': os.getenv('MYSQL_USER', 'root'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),
+        'HOST': os.getenv('MYSQL_HOST', 'localhost'),
+        'PORT': os.getenv('MYSQL_PORT', '3306'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
@@ -116,6 +120,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'jlbs_app/static'),
 ]
 
+# Media files (Uploaded files)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -123,20 +131,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
-
 LOGIN_URL = 'login'
 
-# Duración de la sesión (por ejemplo, 1 hora)
+# Session settings
 SESSION_COOKIE_AGE = 3600
-
-# Configura la cookie de sesión como segura
-SESSION_COOKIE_SECURE = True
-
-# Establece el atributo HttpOnly en la cookie de sesión
+SESSION_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_HTTPONLY = True
 
-# Configura CSRF como seguro
-CSRF_COOKIE_SECURE = True
+# CSRF settings
+CSRF_COOKIE_SECURE = not DEBUG
 
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesStandaloneBackend',  # Añadir AxesStandaloneBackend como primer backend
@@ -148,6 +151,7 @@ AXES_COOLOFF_TIME = 24  # En horas
 AXES_LOCKOUT_URL = '/lockout/'  # URL a la que redireccionar en caso de bloqueo
 AXES_LOCKOUT_PARAMETERS = ["username"]
 AXES_CLIENT_IP_CALLABLE = lambda x: None
+AXES_CACHE = 'default'
 
 # Configuración de caché
 CACHES = {
@@ -157,4 +161,32 @@ CACHES = {
     }
 }
 
-AXES_CACHE = 'default'
+#Configuración de Servicio SFTP
+SFTP_HOST = os.getenv('SFTP_HOST', 'localhost')
+SFTP_PORT = int(os.getenv('SFTP_PORT', 2222))
+SFTP_USER = os.getenv('SFTP_USER', 'sftpuser')
+SFTP_PASS = os.getenv('SFTP_PASS', 'password')
+
+
+
+#Puntos para Subir al ambiente de desarrollo
+#Generar un nuevo secret key
+#debug = false
+#configurar allowed_hosts
+#Configuracion de Cookies CSRF Seguras
+#CSRF_COOKIE_SECURE = True asegura que la cookie solo se envie a través de conexiones https
+#CSRF_COOKIE_HTTPOnly = True asegura que la cookie no sea accesible através de JavaScript
+#CSRF_USE_SESSIONS almacena el token CSRF en la sesion del usuario en lugar de en una cookie separada.
+#SESSION_COOKIE_SECURE = asegura que las cookies de sesion solo se transmitan a través de HTTPS.
+#SESSION_COOKIE_HTTPONLY = Evita que las cookies de sesion sean accesibles a traves de JavaScript
+#Secure_Browser_Xss_Filter = habilita el filtro xss del navegador para mitigar ataques XSS.
+#Secure_Content_Type_Nosniff = evita que el navegador intente adivinar el tipo de contenido de los archivos, reduciendo el riesgo de ciertos tipos de ataques.
+#Secure_Hsts_Seconds = habilita http strict transport security para obligar a los navegadores a usar solo HTTPS durante un año
+#Secure_hsts_include_subdomains = aplica hsts a todos los subdominios
+#Secure_Hsts_Preload = permite que el dominio sea incluido en la lista de precarga hsts
+#Secure_SSL_Redirect = redirige todas las solicitudes http a https, asegurando que todas las comunicacione sean seguras.
+#Estar seguro que la aplicación funciona en https
+#Obtener Certificado SSL/TLS
+#Configurar el servidor Web
+#Configurar Django para https
+#Configurar Redirección a Https
