@@ -5,16 +5,14 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
+from django.conf import settings
 from django.http import HttpResponse
 from django.utils import timezone
 from axes.helpers import get_client_ip_address
 from axes.models import AccessAttempt
 from axes.utils import reset
-from django.conf import settings
 
 @csrf_protect
-
-
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -28,7 +26,7 @@ def login_view(request):
             messages.error(request, 'Tu cuenta está bloqueada debido a múltiples intentos fallidos.')
             return redirect(settings.AXES_LOCKOUT_URL)
 
-        user = authenticate(request=request, username=username, password=password)
+        user = authenticate(request, username=username, password=password)
         
         if user is not None:
             login(request, user)

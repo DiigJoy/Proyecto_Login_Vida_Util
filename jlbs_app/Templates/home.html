@@ -6,7 +6,6 @@
     <title>Página Principal</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
@@ -72,7 +71,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            console.log("Script cargado");
 
             document.getElementById('logout-button').addEventListener('click', function(event) {
                 event.preventDefault();
@@ -83,7 +81,6 @@
             });
 
             window.addEventListener('popstate', function(event) {
-                console.log("Evento popstate detectado");
                 if (confirm('¿Deseas efectuar un logout?')) {
                     window.location.href = '{% url "logout" %}';
                 } else {
