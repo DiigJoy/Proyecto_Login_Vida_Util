@@ -50,7 +50,7 @@ ROOT_URLCONF = 'id_logistics_unilever.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'Templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'jlbs_app', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
